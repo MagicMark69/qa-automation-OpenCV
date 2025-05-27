@@ -7,6 +7,7 @@ This is a Java-based desktop automation tool leveraging OpenCV for image recogni
 - Automates clicks, keystrokes, and screen navigation
 - Wait-for-element and timeout handling
 - Screenshot logging
+- [NEW] Robust error handling with tryRun(): Gracefully handle failures without terminating the script. Users are prompted to continue or stop the automation when an error occurs.
 
 ## 🧪 Demo Scripts
 
@@ -31,7 +32,7 @@ Automates form interaction on [W3Schools HTML Forms](https://www.w3schools.com/H
 - IntelliJ IDEA
 
 ## 🎬 Demo
-[watch the full video] (https://youtu.be/5PWGLEyuQkY)
+[watch the full video] (https://youtu.be/5xOYyzx1Db4)
 
 ## 🗂️ How to Use
 
