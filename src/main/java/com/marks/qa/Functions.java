@@ -11,6 +11,7 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.InputStream;
+import java.util.Scanner;
 import javax.imageio.ImageIO;
 import org.bytedeco.opencv.opencv_core.Mat;
 
@@ -21,35 +22,26 @@ public class Functions {
     //// _____IMPORTANT FOR GENERAL QA-ing_____
 
     // Checks if Target image is visible
-    public static Point waitForTarget(String imageName, double confidence, int timeoutSeconds) {
-        try {
-            Thread.sleep(500); // wait 0.5 second
-            long startTime = System.currentTimeMillis();
-            long timeout = timeoutSeconds * 1000L;
+    public static Point waitForTarget(String imageName, double confidence, int timeoutSeconds) throws Exception {
+        Thread.sleep(500); // wait 0.5 second
+        long startTime = System.currentTimeMillis();
+        long timeout = timeoutSeconds * 1000L;
 
-            while (System.currentTimeMillis() - startTime < timeout) {
-                Mat screenMat = takeScreenshot();
-                Mat targetMat = loadTarget(imageName);
-                Point match = matchImg(screenMat, targetMat, confidence);
+        while (System.currentTimeMillis() - startTime < timeout) {
+            Mat screenMat = takeScreenshot();
+            Mat targetMat = loadTarget(imageName);
+            Point match = matchImg(screenMat, targetMat, confidence);
 
-                if (match != null) {
-                    System.out.println(imageName + " has been found");
-                    return match;
-                }
-
-                System.out.println("No match yet for " + imageName + ", retrying...");
-                Thread.sleep(500); // wait 0.5 second before retry
+            if (match != null) {
+                System.out.println(imageName + " has been found");
+                return match;
             }
 
-            String errorMessage = "[ERROR] " + imageName + " not found within " + timeoutSeconds + " seconds.";
-            System.err.println(errorMessage);
-            System.exit(1); // exit the entire program with error status
-        } catch (Exception e) {
-            System.err.println("[EXCEPTION] An unexpected error occurred:");
-            e.printStackTrace();
-            System.exit(1);
+            System.out.println("No match yet for " + imageName + ", retrying...");
+            Thread.sleep(500); // wait 0.5 second before retry
         }
-        return null;
+
+        throw new Exception("[ERROR] " + imageName + " not found within " + timeoutSeconds + " seconds.");
     }
 
     // Takes screenshot
@@ -103,6 +95,23 @@ public class Functions {
         Mat mat = new Mat(bi.getHeight(), bi.getWidth(), opencv_core.CV_8UC3);
         mat.data().put(pixels);
         return mat;
+    }
+
+    // Try-catch handler
+    public static void tryRun(CheckedRunnable action) {
+        try {
+            action.run();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println(e.getMessage());
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Image not found. Do you want to continue? (y/n): ");
+            String input = scanner.nextLine();
+            if (!input.equalsIgnoreCase("y")) {
+                System.out.println("Exiting program.");
+                System.exit(1);
+            }
+        }
     }
 
     // Clicks center of matched area
